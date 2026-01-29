@@ -1,0 +1,193 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["labAccess"])) {
+  header("location:../index.php");
+  exit();
+}
+if ($_SESSION["labAccess"] <> "Yes") {
+  header("location:../index.php");
+  exit();
+}
+$labIdUser = $_SESSION['labIdUser'];
+$labIdDepUser = $_SESSION['labIdDepUser'];
+
+require_once '../../model/Pap.php';
+$pap = new Pap();
+
+$aColumns = array('pape.create_received_at', '', '', '', '', '', ''); //Kolom Pada Tabel
+// Indexed column (used for fast and accurate table cardinality)
+$sIndexColumn = 'pape.create_received_at';
+
+// DB table to use
+//$sTable = 'tbl_equipos'; // Nama Tabel
+// Database connection information
+//$gaSql['port']     = 5433; // 3306 is the default MySQL port
+// Input method (use $_GET, $_POST or $_REQUEST)
+$input = & $_POST;
+
+$gaSql['charset'] = 'utf8';
+
+/**
+ * MySQL connection
+ */
+//$db = pg_connect($gaSql['server'], $gaSql['port'],$gaSql['db'] ,$gaSql['user'], $gaSql['password']);
+
+/* if (!$db->set_charset($gaSql['charset'])) {
+  die( 'Error loading character set "'.$gaSql['charset'].'": '.$db->error );
+  }
+ */
+
+/**
+ * Paging
+ */
+$sLimit = "";
+if (isset($input['iDisplayStart']) && $input['iDisplayLength'] != '-1') {
+    $sLimit = " LIMIT " . intval($input['iDisplayLength']) . " OFFSET " . intval($input['iDisplayStart']);
+}
+
+
+/**
+ * Ordering
+ */
+$aOrderingRules = array();
+if (isset($input['iSortCol_0'])) {
+    $iSortingCols = intval($input['iSortingCols']);
+    for ($i = 0; $i < $iSortingCols; $i++) {
+        if ($input['bSortable_' . intval($input['iSortCol_' . $i])] == 'true') {
+            $aOrderingRules[] = "" . $aColumns[intval($input['iSortCol_' . $i])] . " "
+                    . ($input['sSortDir_' . $i] === 'asc' ? 'asc' : 'desc');
+        }
+    }
+}
+
+if (!empty($aOrderingRules)) {
+    $sOrder = " ORDER BY " . implode(", ", $aOrderingRules);
+} else {
+    $sOrder = " Order By pape.pape.create_received_at desc";
+}
+
+
+/**
+ * Filtering
+ * NOTE this does not match the built-in DataTables filtering which does it
+ * word by word on any field. It's possible to do here, but concerned about efficiency
+ * on very large tables, and MySQL's regex functionality is very limited
+ */
+$iColumnCount = count($aColumns);
+if (isset($input['sSearch']) && $input['sSearch'] != "") {
+    $aFilteringRules = array();
+    for ($i = 0; $i < $iColumnCount; $i++) {
+        if (isset($input['bSearchable_' . $i]) && $input['bSearchable_' . $i] == 'true') {
+            $aFilteringRules[] = "" . $aColumns[$i] . " LIKE '%" . $input['sSearch'] . "%'";
+        }
+    }
+    if (!empty($aFilteringRules)) {
+        $aFilteringRules = array('(' . implode(" OR ", $aFilteringRules) . ')');
+    }
+}
+
+// Individual column filtering
+for ($i = 0; $i < $iColumnCount; $i++) {
+    if (isset($input['bSearchable_' . $i]) && $input['bSearchable_' . $i] == 'true' && $input['sSearch_' . $i] != '') {
+        $aFilteringRules[] = "" . $aColumns[$i] . " LIKE '%" . mb_strtoupper(pg_escape_string($input['sSearch_' . $i]), 'UTF-8') . "%'";
+    }
+}
+
+/* 	if (!empty($aFilteringRules)) {
+  $sWhere = " WHERE idestado_mov = '2' and tm.dep_recibe='".$_SESSION['id_dep']."'
+  AND
+  to_char(tm.fec_deriva,'dd/mm/yyyy hh:mi:ss') = (select to_char(max(tmm.fec_deriva),'dd/mm/yyyy hh:mi:ss') FROM tbl_ht_movimiento tmm)
+  and tm.usu_recibe='".$_SESSION['id_usuario']."'
+  and  ".implode(" AND ", $aFilteringRules);
+  } else {
+  $sWhere = " WHERE idestado_mov = '2' and tm.dep_recibe='".$_SESSION['id_dep']."'
+  AND
+  to_char(tm.fec_deriva,'dd/mm/yyyy hh:mi:ss') = (select to_char(max(tmm.fec_deriva),'dd/mm/yyyy hh:mi:ss') FROM tbl_ht_movimiento tmm)
+  and tm.usu_recibe='".$_SESSION['id_usuario']."'
+  ";
+  } */
+
+
+if (!empty($aFilteringRules)) {
+    $sWhere = "
+		and  " . implode(" AND ", $aFilteringRules);
+} else {
+    $sWhere = "
+		";
+}
+
+
+/**
+ * SQL queries
+ * Get data to display
+ */
+$aQueryColumns = array();
+foreach ($aColumns as $col) {
+    if ($col != ' ') {
+        $aQueryColumns[] = $col;
+    }
+}
+
+$param[0]['idDepRef'] = $input['idDepRef'];
+$param[0]['estEnv'] = 'Pro';
+//print_r($param);
+//Aqui se manda los parametros de busqueda
+$rResult = $pap->get_tblDatosRecepSolicitud($sWhere, $sOrder, $sLimit, $param);
+//print_r($rResult);
+$rResultFilterTotal = $pap->get_tblCountRecepSolicitud($sWhere, $param);
+/* echo $rResultFilterTotal."Jose";
+  exit(); */
+list($iFilteredTotal) = $rResultFilterTotal;
+$rResultTotal = $pap->get_tblCountRecepSolicitud($sWhere, $param);
+//$rResultTotal = $rResultFilterTotal;
+list($iTotal) = $rResultTotal;
+
+
+/**
+ * Output
+ */
+$output = array(
+    //"sEcho"                => intval($input['sEcho']),
+    "iTotalRecords" => $rResultFilterTotal,
+    "iTotalDisplayRecords" => $rResultFilterTotal,
+    "aaData" => array(),
+);
+
+// Voy a mostrar la informaci�n que tiene que ser igual a las cabecera de la tabla (th)
+$ebien = '';
+foreach ($rResult as $aRow) {
+    $row = array();
+
+    for ($i = 0; $i < $iColumnCount; $i++) {
+        if (isset($aRow[$aColumns[$i]]))
+            $row[] = $aRow[$aColumns[$i]];
+    }
+    //Aqui agrego primer boton
+    $btnDet = '<a href="#" data-target="#editProductModal" class="detail" data-toggle="tooltip" data-placement="top" title="Ver lista de muestras" onclick="event.preventDefault(); open_detalle(\'' . $aRow['id_papenvio'] . '\');"><i class="glyphicon glyphicon-eye-open"></i></a>';
+
+      $tipoFin = $aRow['cnt_solirechazada'] + $aRow['cnt_solinoconfor'];
+
+      if($aRow['cnt_solienvtot'] == ($aRow['cnt_solirechazada'] + $aRow['cnt_soliprocesada'])){
+        $btnRec = '';
+        $btnFin = ' <a href="#" data-target="#editProductModal" class="acept" data-toggle="tooltip" data-placement="top" title="Finalizar envío" onclick="event.preventDefault(); reg_finalizar(\'' . $aRow['id_papenvio'] . '\',\'' . $tipoFin . '\');"><i class="glyphicon glyphicon-ok-sign"></i></a>';
+      } else {
+        $btnRec = ' <a href="#" data-target="#editProductModal" class="acept" data-toggle="tooltip" data-placement="top" title="Recepcionar envio" onclick="event.preventDefault(); reg_proceso(\'' . $aRow['id_papenvio'] . '\');"><i class="glyphicon glyphicon-ok"></i></a>';
+        $btnFin = '';
+      }
+
+      if(($aRow['cnt_solipormodif'] + $aRow['cnt_soliaceptada'] + $aRow['cnt_solirechazada'] + $aRow['cnt_soliprocesada']) == 0){
+        $btnEnu = ' <a href="#" data-target="#editProductModal" class="delete" data-toggle="tooltip" data-placement="top" title="volver a enumerar envío" onclick="event.preventDefault(); show_recepcion_manual(\'' . $aRow['id_papenvio'] . '\',\'' . $aRow['nom_depen'] . '\',\'' . $aRow['nro_papenv'] . '\');"><i class="glyphicon glyphicon-refresh"></i></a>';
+		$btnVBR = ' <a href="#" data-target="#editProductModal" class="info" data-toggle="tooltip" data-placement="top" title="Volver envío a bandeja de recepción" onclick="event.preventDefault(); regresar_envio(\'' . $aRow['id_papenvio'] . '\',\'' . $aRow['nom_depen'] . '\',\'' . $aRow['nro_papenv'] . '\');"><i class="fa fa-hand-o-up"></i></a>';
+      } else {
+        $btnEnu = '';
+		$btnVBR = '';
+      }
+
+
+	$btnfechaEnv = ' <a href="#" data-toggle="tooltip" data-placement="top" title="Detalle envío" onclick="event.preventDefault(); det_envio(\'' . $aRow['fec_papenvio'] . '\',\'' . $aRow['fec_paprecepsede'] . '\',\'' . $aRow['fec_papenviosede'] . '\',\'' . $aRow['fec_papreceplab'] . '\',\'' . $aRow['fec_papfinalizado'] . '\',\'' . $aRow['nro_papenv'] . '\',\'' . $aRow['nom_depen'] . '\');">'.$aRow['fec_papreceplab'].'</a>';
+    $row = array($btnfechaEnv, $aRow['nom_depen'], $aRow['nro_papenv'], $aRow['nom_estadopapenv'], "<span class=\"badge bg-blue\">".$aRow['cnt_solienvtot']."</span>", "<span class=\"badge bg-green\">".$aRow['cnt_soliaceptada']."</span>", "<span class=\"badge bg-yellow\">".$aRow['cnt_solipormodif']."</span>", "<span class=\"badge bg-red\">".$aRow['cnt_solirechazada']."</span>", "<span class=\"badge bg-blue\">".$aRow['cnt_soliprocesada']."</span>", "<span class=\"badge \">".$aRow['cnt_solinoconfor']."</span>", $btnDet.$btnVBR.$btnEnu.$btnRec.$btnFin);
+    $output['aaData'][] = $row;
+}
+echo json_encode($output);
+?>
