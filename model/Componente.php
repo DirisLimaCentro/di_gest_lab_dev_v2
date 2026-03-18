@@ -45,9 +45,10 @@ class Componente {
     $this->sql = "Select c.id_componente, c.descrip_comp, c.id_unimedida, um.descrip_unimedida uni_medida, c.descrip_valor,
     c.idtipo_ingresol, Case When c.idtipo_ingresol=1 Then 'LINEA'::Varchar Else 'MULTILINEA'::Varchar End ing_solu,
     idtipocaracter_ingresul, Case idtipocaracter_ingresul When 1 Then 'LETRAS/NUMEROS'::Varchar When 2 Then 'LETRAS'::Varchar When 3 Then 'NUMERO ENTERO'::Varchar Else 'NUMERO DECIMAL'::Varchar End nomtipocaracter_ingresul,
-    detcaracter_ingresul,
+    detcaracter_ingresul, c.idseleccion_ingresul, sr.nombre_resultado AS nombre_selecresultado,
     c.estado id_estado, Case When c.estado=1 Then 'ACTIVO'::Varchar Else 'INACTIVO'::Varchar End nom_estado From tbl_componente c
     Left Join tbl_unimedida um On c.id_unimedida = um.id_unimedida
+    Left Join tbl_componente_seleccionresul sr On c.idseleccion_ingresul = sr.id
     Where c.id_componente=$1";
     $this->rs = $this->db->query_params($this->sql, $aparam);
     $this->db->closeConnection();
@@ -150,9 +151,10 @@ class Componente {
     $this->sql = "Select c.id_componente, c.descrip_comp, c.id_unimedida, um.descrip_unimedida uni_medida, c.descrip_valor,
     c.idtipo_ingresol, Case When c.idtipo_ingresol=1 Then 'LINEA'::Varchar Else 'MULTILINEA'::Varchar End ing_solu,
     idtipocaracter_ingresul, Case idtipocaracter_ingresul When 1 Then 'LETRAS/NUMEROS'::Varchar When 2 Then 'LETRAS'::Varchar When 3 Then 'NUMERO ENTERO'::Varchar Else 'NUMERO DECIMAL'::Varchar End nomtipocaracter_ingresul,
-    detcaracter_ingresul,
+    detcaracter_ingresul, c.idseleccion_ingresul, sr.nombre_resultado AS nombre_selecresultado,
     c.estado, Case When c.estado=1 Then 'ACTIVO'::Varchar Else 'INACTIVO'::Varchar End nom_estado From tbl_componente c
-    Left Join tbl_unimedida um On c.id_unimedida = um.id_unimedida";
+    Left Join tbl_unimedida um On c.id_unimedida = um.id_unimedida
+    Left Join tbl_componente_seleccionresul sr On c.idseleccion_ingresul = sr.id";
     $this->sql .= $sWhere. $sOrder . $sLimit;
     $this->rs = $this->db->query($this->sql);
     $this->db->closeConnection();
@@ -305,6 +307,24 @@ Order By edadanio_min, edadmes_min, edaddia_min";
 		$this->db->closeConnection();
 		return $this->rs;
 	}
+
+  public function get_valor_defectoSeleccionResultado($idTipo) {
+    $this->db->getConnection();
+    $this->sql = "select coalesce((SELECT id FROM tbl_componente_seleccionresuldet Where id_componente_seleccionresul=".$idTipo." And chk_valor_defecto=TRUE And estado=1 limit 1), 0) id_val_defaul";
+    $this->rs = $this->db->query($this->sql);
+    $this->db->closeConnection();
+    $val_defecto = $this->rs[0]['id_val_defaul'];
+	if ($val_defecto == "0"){ $val_defecto='';}
+	return $val_defecto;
+  }
+  
+  public function get_listaSeleccionResultadoPorTipo($idTipo) {
+    $this->db->getConnection();
+    $this->sql = "SELECT id, nombre FROM tbl_componente_seleccionresuldet Where id_componente_seleccionresul=".$idTipo." And estado=1 order by orden_muestra_resul";
+    $this->rs = $this->db->query($this->sql);
+    $this->db->closeConnection();
+    return $this->rs;
+  }
 
   /*
 

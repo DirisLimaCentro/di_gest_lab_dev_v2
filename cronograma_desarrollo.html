@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cronograma de Desarrollo — Sistema di_gest_lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 11pt;
+      color: #1a1a2e;
+      background: #f5f7fa;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 40px 50px;
+    }
+
+    /* ── ENCABEZADO ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 3px solid #1a56db;
+      padding-bottom: 18px;
+      margin-bottom: 28px;
+    }
+    .header-left h1 {
+      font-size: 18pt;
+      font-weight: 700;
+      color: #1a56db;
+      letter-spacing: -0.5px;
+    }
+    .header-left h2 {
+      font-size: 12pt;
+      font-weight: 500;
+      color: #374151;
+      margin-top: 4px;
+    }
+    .header-right {
+      text-align: right;
+      font-size: 9pt;
+      color: #6b7280;
+      line-height: 1.8;
+    }
+    .header-right strong { color: #1a1a2e; }
+
+    /* ── FICHA DE PROYECTO ── */
+    .ficha {
+      background: #f0f4ff;
+      border-left: 4px solid #1a56db;
+      border-radius: 0 6px 6px 0;
+      padding: 14px 18px;
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .ficha-item label {
+      display: block;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+    .ficha-item span {
+      font-weight: 600;
+      color: #1a1a2e;
+      font-size: 10pt;
+    }
+
+    /* ── SECCIONES ── */
+    .section {
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #1a56db;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+    .section-subtitle {
+      font-size: 10pt;
+      color: #6b7280;
+      margin-top: -10px;
+      margin-bottom: 14px;
+    }
+
+    /* ── TABLAS ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+      margin-bottom: 8px;
+    }
+    thead tr {
+      background: #1a56db;
+      color: #fff;
+    }
+    thead th {
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 9pt;
+    }
+    tbody tr:nth-child(even) { background: #f8faff; }
+    tbody tr:hover { background: #e8f0ff; }
+    tbody td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+    .td-num { text-align: center; font-weight: 600; }
+    .td-center { text-align: center; }
+
+    /* ── BADGES FASE ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 8pt;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-bd   { background:#fef3c7; color:#92400e; }
+    .badge-back { background:#dcfce7; color:#166534; }
+    .badge-front{ background:#dbeafe; color:#1e40af; }
+    .badge-integ{ background:#f3e8ff; color:#6b21a8; }
+    .badge-test { background:#fee2e2; color:#991b1b; }
+    .badge-db   { background:#ffedd5; color:#9a3412; }
+
+    /* ── PRIORIDAD ── */
+    .prio-alta   { color: #dc2626; font-weight: 600; }
+    .prio-media  { color: #d97706; font-weight: 600; }
+    .prio-baja   { color: #16a34a; font-weight: 600; }
+
+    /* ── TOTALES ── */
+    .totals-row td {
+      background: #1a56db !important;
+      color: #fff !important;
+      font-weight: 700;
+      border: none;
+    }
+    .subtotal-row td {
+      background: #e0e7ff !important;
+      font-weight: 700;
+      color: #1e40af;
+    }
+
+    /* ── RESUMEN EJECUTIVO ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .summary-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .summary-card .num {
+      font-size: 22pt;
+      font-weight: 700;
+      color: #1a56db;
+      line-height: 1;
+    }
+    .summary-card .lbl {
+      font-size: 8.5pt;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    /* ── GANTT SIMPLIFICADO ── */
+    .gantt-wrap {
+      overflow-x: auto;
+      margin-bottom: 8px;
+    }
+    .gantt-table {
+      min-width: 900px;
+    }
+    .gantt-table thead th { font-size: 8pt; padding: 5px 4px; text-align: center; }
+    .gantt-table tbody td { padding: 5px 6px; font-size: 8.5pt; border-bottom: 1px solid #e5e7eb; }
+    .gantt-cell { text-align: center; }
+    .bar {
+      display: inline-block;
+      height: 14px;
+      border-radius: 3px;
+      width: 90%;
+    }
+    .bar-f1 { background: #3b82f6; }
+    .bar-f2 { background: #10b981; }
+    .bar-f3 { background: #8b5cf6; }
+    .bar-f4 { background: #f59e0b; }
+    .bar-empty { background: transparent; }
+
+    /* ── RIESGOS ── */
+    .riesgo-table td:first-child { font-weight: 500; width: 28%; }
+    .alto  { color: #dc2626; }
+    .medio { color: #d97706; }
+    .bajo  { color: #16a34a; }
+
+    /* ── SUPUESTOS ── */
+    .supuestos ul {
+      padding-left: 18px;
+    }
+    .supuestos li {
+      font-size: 9.5pt;
+      color: #374151;
+      line-height: 1.8;
+    }
+
+    /* ── FIRMA ── */
+    .firma-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 30px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .firma-box {
+      text-align: center;
+    }
+    .firma-line {
+      border-top: 1px solid #374151;
+      margin: 50px 10px 6px;
+    }
+    .firma-name { font-size: 9.5pt; font-weight: 600; }
+    .firma-role { font-size: 8.5pt; color: #6b7280; }
+
+    /* ── FOOTER ── */
+    .doc-footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8pt;
+      color: #9ca3af;
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      body { background: #fff; }
+      .page { padding: 20px 30px; }
+      .no-print { display: none; }
+      thead { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .summary-card .num { color: #1a56db !important; }
+      .totals-row td, thead tr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+
+    .btn-print {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-size: 11pt;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(26,86,219,0.4);
+      z-index: 999;
+    }
+    .btn-print:hover { background: #1e40af; }
+  </style>
+</head>
+<body>
+
+<button class="btn-print no-print" onclick="window.print()">⬇ Imprimir / Guardar PDF</button>
+
+<div class="page">
+
+  <!-- ENCABEZADO -->
+  <div class="header">
+    <div class="header-left">
+      <h1>PLAN DE DESARROLLO DE SOFTWARE</h1>
+      <h2>Sistema di_gest_lab — Módulo Laboratorio Referencial</h2>
+    </div>
+    <div class="header-right">
+      <strong>Código:</strong> PDS-LAB-2026-001<br/>
+      <strong>Versión:</strong> 1.0<br/>
+      <strong>Fecha:</strong> 13/03/2026<br/>
+      <strong>Estado:</strong> Aprobación pendiente
+    </div>
+  </div>
+
+  <!-- FICHA -->
+  <div class="ficha">
+    <div class="ficha-item">
+      <label>Proyecto</label>
+      <span>Sistema Gestión Laboratorio DIRIS</span>
+    </div>
+    <div class="ficha-item">
+      <label>Elaborado por</label>
+      <span>Analista / Ing. de Sistemas</span>
+    </div>
+    <div class="ficha-item">
+      <label>Área solicitante</label>
+      <span>Laboratorio Referencial</span>
+    </div>
+    <div class="ficha-item">
+      <label>Tecnología</label>
+      <span>PHP / PostgreSQL / Bootstrap</span>
+    </div>
+    <div class="ficha-item">
+      <label>Inicio estimado</label>
+      <span>16/03/2026</span>
+    </div>
+    <div class="ficha-item">
+      <label>Fin estimado</label>
+      <span>17/04/2026</span>
+    </div>
+  </div>
+
+  <!-- RESUMEN EJECUTIVO -->
+  <div class="section">
+    <div class="section-title">1. RESUMEN EJECUTIVO</div>
+    <p style="font-size:10pt; color:#374151; margin-bottom:16px; line-height:1.7;">
+      El presente documento describe el plan de trabajo para la implementación de dos módulos funcionales en el sistema de gestión de laboratorio:
+      <strong>(1)</strong> Flujo completo para el examen <em>Hemoglobina Glicosilada (HbA1c) — Código 83036</em>, replicando la arquitectura del flujo PSA existente;
+      y <strong>(2)</strong> Módulo de mantenimiento para la gestión de <em>Grupos de Derivación por Dependencia</em>, que permitirá configurar dinámicamente qué establecimientos de origen derivan muestras a qué laboratorio de destino según convenios vigentes.
+    </p>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="num">2</div>
+        <div class="lbl">Módulos a desarrollar</div>
+      </div>
+      <div class="summary-card">
+        <div class="num">152</div>
+        <div class="lbl">Horas hombre estimadas</div>
+      </div>
+      <div class="summary-card">
+        <div class="num">~19</div>
+        <div class="lbl">Días hábiles</div>
+      </div>
+      <div class="summary-card">
+        <div class="num">~4</div>
+        <div class="lbl">Semanas calendario</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULO 1: HbA1c -->
+  <div class="section">
+    <div class="section-title">2. MÓDULO 1 — Hemoglobina Glicosilada HbA1c (83036)</div>
+    <div class="section-subtitle">Alcance: Replicar el flujo completo de PSA (id_producto=60) para el nuevo examen HbA1c con su propio id_producto y stored procedures.</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:4%">#</th>
+          <th style="width:32%">Tarea</th>
+          <th style="width:12%">Capa</th>
+          <th style="width:14%">Entregable</th>
+          <th style="width:8%">Prioridad</th>
+          <th style="width:10%">H/H Est.</th>
+          <th style="width:10%">Días</th>
+          <th style="width:10%">Responsable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-num">1.1</td>
+          <td><strong>Registro del producto en BD</strong><br/><small>INSERT en tbl_producto para HbA1c (código 83036), configurar componentes, valores de referencia y tipo de ingreso en tbl_componente</small></td>
+          <td class="td-center"><span class="badge badge-bd">Base Datos</span></td>
+          <td>Scripts SQL</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">6</td>
+          <td class="td-num">0.75</td>
+          <td>Analista BD</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.2</td>
+          <td><strong>Stored Procedure sp_crud_hba1c</strong><br/><small>Crear en schema lab_ref. Clonar lógica de sp_crud_psa adaptando tablas e id_producto. Incluir acciones: C, E, D.</small></td>
+          <td class="td-center"><span class="badge badge-bd">Base Datos</span></td>
+          <td>SP PostgreSQL</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">10</td>
+          <td class="td-num">1.25</td>
+          <td>Analista BD</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.3</td>
+          <td><strong>Extensión sp_crud_envio para HbA1c</strong><br/><small>Agregar acciones IREXCELHBA1C y VALIDHBA1C al SP de envío existente en schema lab.</small></td>
+          <td class="td-center"><span class="badge badge-bd">Base Datos</span></td>
+          <td>SP modificado</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">6</td>
+          <td class="td-num">0.75</td>
+          <td>Analista BD</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.4</td>
+          <td><strong>Métodos en model/Lab.php</strong><br/><small>Agregar: get_tblDatosIngResultadoHBA1C() y get_ObtenerDatosAtencionHBA1C(). Cambiar id_producto=60 por ID de HbA1c.</small></td>
+          <td class="td-center"><span class="badge badge-back">Backend</span></td>
+          <td>model/Lab.php</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">4</td>
+          <td class="td-num">0.5</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.5</td>
+          <td><strong>Método en model/LabRef.php</strong><br/><small>Agregar post_reg_hba1c() que llame a lab_ref.sp_crud_hba1c($1,$2,$3,$4).</small></td>
+          <td class="td-center"><span class="badge badge-back">Backend</span></td>
+          <td>model/LabRef.php</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">2</td>
+          <td class="td-num">0.25</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.6</td>
+          <td><strong>Casos en controller/ctrlLab.php</strong><br/><small>Agregar: CARGA_ARCHIVO_RESUL_HBA1C, POST_ADD_RESULHBA1C, POST_ADD_VALIDRESULHBA1C, POST_ADD_VALIDRESULHBA1CUNICO. Reemplazar id_producto=60 e id_dependencia=67 por los de HbA1c.</small></td>
+          <td class="td-center"><span class="badge badge-back">Backend</span></td>
+          <td>ctrlLab.php</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">8</td>
+          <td class="td-num">1.0</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.7</td>
+          <td><strong>Vista: Recepción HbA1c (labrefen)</strong><br/><small>Crear main_hba1crecepcion.php y main_hba1crecepcionn.php. Adaptar desde main_psarecepcion.php. Corregir referencia a id_producto hardcoded (selected="60").</small></td>
+          <td class="td-center"><span class="badge badge-front">Frontend</span></td>
+          <td>2 vistas PHP</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">12</td>
+          <td class="td-num">1.5</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.8</td>
+          <td><strong>Vistas: Tablas clasificación (labrefen)</strong><br/><small>Crear tbl_hba1crecepcionn_acep.php, tbl_hba1crecepcionn_clasi.php, tbl_hba1crecepcionn_obs.php. DataTables server-side.</small></td>
+          <td class="td-center"><span class="badge badge-front">Frontend</span></td>
+          <td>3 archivos PHP</td>
+          <td class="prio-media">MEDIA</td>
+          <td class="td-num">8</td>
+          <td class="td-num">1.0</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.9</td>
+          <td><strong>Vista: Registro de Resultado HbA1c</strong><br/><small>Crear main_hba1cregresultado.php + tbl_hba1cregresultado.php. Incluir carga de archivo Excel (conversión CSV vía libreoffice), validación individual y masiva.</small></td>
+          <td class="td-center"><span class="badge badge-front">Frontend</span></td>
+          <td>2 vistas PHP</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">14</td>
+          <td class="td-num">1.75</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.10</td>
+          <td><strong>Vistas: Validación LAB origen</strong><br/><small>Crear tbl_hba1crecepcionn_proceso.php y tbl_hba1crecepcionn_validado.php en view/lab/ para seguimiento desde el establecimiento de origen.</small></td>
+          <td class="td-center"><span class="badge badge-front">Frontend</span></td>
+          <td>2 archivos PHP</td>
+          <td class="prio-media">MEDIA</td>
+          <td class="td-num">6</td>
+          <td class="td-num">0.75</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.11</td>
+          <td><strong>PDFs de resultado HbA1c</strong><br/><small>Crear pdf_laboratorio_hba1c.php en view/lab/ y view/labrefen/. Adaptar diseño del reporte, reemplazar firmas y logo si aplica. Corregir id_producto hardcoded.</small></td>
+          <td class="td-center"><span class="badge badge-front">Frontend</span></td>
+          <td>2 PDFs PHP</td>
+          <td class="prio-media">MEDIA</td>
+          <td class="td-num">8</td>
+          <td class="td-num">1.0</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.12</td>
+          <td><strong>Registro en menú y asignación de accesos</strong><br/><small>INSERT en tbl_menudetalle para cada vista nueva. Asignar id_detmenu a usuarios del LAB REFERENCIAL. Verificar rutas link_detmenu.</small></td>
+          <td class="td-center"><span class="badge badge-db">Config.</span></td>
+          <td>Scripts SQL</td>
+          <td class="prio-media">MEDIA</td>
+          <td class="td-num">3</td>
+          <td class="td-num">0.5</td>
+          <td>Analista</td>
+        </tr>
+        <tr>
+          <td class="td-num">1.13</td>
+          <td><strong>Pruebas funcionales y correcciones</strong><br/><small>Prueba de flujo completo: envío → recepción → clasificación → carga Excel → validación → PDF. Prueba en BD de test y producción.</small></td>
+          <td class="td-center"><span class="badge badge-test">Testing</span></td>
+          <td>Informe de pruebas</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">16</td>
+          <td class="td-num">2.0</td>
+          <td>Analista + Dev</td>
+        </tr>
+        <tr class="subtotal-row">
+          <td colspan="5" style="text-align:right; padding-right:16px;">SUBTOTAL MÓDULO 1 — HbA1c</td>
+          <td class="td-num">103</td>
+          <td class="td-num">~12.5</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MODULO 2: GRUPOS DEPENDENCIAS -->
+  <div class="section">
+    <div class="section-title">3. MÓDULO 2 — Mantenimiento Grupos de Derivación por Dependencia</div>
+    <div class="section-subtitle">Alcance: Configurar dinámicamente grupos de establecimientos origen → destino para derivación de muestras según convenios. N grupos ilimitados.</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:4%">#</th>
+          <th style="width:32%">Tarea</th>
+          <th style="width:12%">Capa</th>
+          <th style="width:14%">Entregable</th>
+          <th style="width:8%">Prioridad</th>
+          <th style="width:10%">H/H Est.</th>
+          <th style="width:10%">Días</th>
+          <th style="width:10%">Responsable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-num">2.1</td>
+          <td><strong>Diseño del modelo de datos</strong><br/><small>DDL para tbl_grupodependencia (cabecera: id, nombre, descripcion, id_dep_destino, estado) y tbl_grupodependencia_det (detalle: id_grupodep, id_dependencia, estado). Constraint UNIQUE por grupo+dependencia.</small></td>
+          <td class="td-center"><span class="badge badge-bd">Base Datos</span></td>
+          <td>DDL + Diagrama ER</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">4</td>
+          <td class="td-num">0.5</td>
+          <td>Analista BD</td>
+        </tr>
+        <tr>
+          <td class="td-num">2.2</td>
+          <td><strong>Stored Procedure sp_crud_grupodependencia</strong><br/><small>SP con acciones: C (crear grupo), E (editar), D (desactivar), AD (agregar dependencia origen), DD (quitar dependencia origen). Retorna estado de operación.</small></td>
+          <td class="td-center"><span class="badge badge-bd">Base Datos</span></td>
+          <td>SP PostgreSQL</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">8</td>
+          <td class="td-num">1.0</td>
+          <td>Analista BD</td>
+        </tr>
+        <tr>
+          <td class="td-num">2.3</td>
+          <td><strong>Model: GrupoDependencia.php</strong><br/><small>Clase con métodos: get_listaGrupos(), get_datoGrupoPorId(), get_dependenciasAsignadas(), get_dependenciasDisponibles(), post_reg_grupo(), post_add_dependencia(), post_del_dependencia().</small></td>
+          <td class="td-center"><span class="badge badge-back">Backend</span></td>
+          <td>model/GrupoDependencia.php</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">5</td>
+          <td class="td-num">0.75</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">2.4</td>
+          <td><strong>Controller: ctrlGrupoDependencia.php</strong><br/><small>Switch/case con acciones: GET_LISTA_GRUPOS, GET_SHOW_DETGRUPO, GET_DEPS_ASIGNADAS, GET_DEPS_DISPONIBLES, POST_REG_GRUPO, POST_ADD_DEP, POST_DEL_DEP.</small></td>
+          <td class="td-center"><span class="badge badge-back">Backend</span></td>
+          <td>controller/ctrlGrupoDependencia.php</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">4</td>
+          <td class="td-num">0.5</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">2.5</td>
+          <td><strong>Vista: Listado de Grupos (DataTable)</strong><br/><small>main_grupodependencia.php — tabla con: nombre, establecimiento destino, nº orígenes asignados, estado, botones editar/gestionar. Modal para crear/editar grupo.</small></td>
+          <td class="td-center"><span class="badge badge-front">Frontend</span></td>
+          <td>Vista + Modal PHP/JS</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">10</td>
+          <td class="td-num">1.25</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">2.6</td>
+          <td><strong>Vista: Panel Asignación Dependencias Origen</strong><br/><small>Panel dual (asignadas / disponibles) con búsqueda en tiempo real. Botones Agregar/Quitar con confirmación. Filtro por nombre de establecimiento. Indicadores de conteo.</small></td>
+          <td class="td-center"><span class="badge badge-front">Frontend</span></td>
+          <td>Panel AJAX</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">10</td>
+          <td class="td-num">1.25</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">2.7</td>
+          <td><strong>Integración con flujo de envío/derivación</strong><br/><small>Modificar lógica de selección de destino en el flujo de envío para que tome el destino desde tbl_grupodependencia según el establecimiento origen del usuario logueado.</small></td>
+          <td class="td-center"><span class="badge badge-integ">Integración</span></td>
+          <td>Modificación ctrlLab</td>
+          <td class="prio-alta">ALTA</td>
+          <td class="td-num">8</td>
+          <td class="td-num">1.0</td>
+          <td>Desarrollador</td>
+        </tr>
+        <tr>
+          <td class="td-num">2.8</td>
+          <td><strong>Registro en menú y pruebas</strong><br/><small>INSERT tbl_menudetalle en Mantenimiento. Pruebas: CRUD grupos, asignación múltiple, validación de convenios activos, verificar que el flujo de derivación respeta la configuración.</small></td>
+          <td class="td-center"><span class="badge badge-test">Testing</span></td>
+          <td>Ítem menú + Pruebas</td>
+          <td class="prio-media">MEDIA</td>
+          <td class="td-num">8</td>
+          <td class="td-num">1.0</td>
+          <td>Analista + Dev</td>
+        </tr>
+        <tr class="subtotal-row">
+          <td colspan="5" style="text-align:right; padding-right:16px;">SUBTOTAL MÓDULO 2 — Grupos Derivación</td>
+          <td class="td-num">57</td>
+          <td class="td-num">~7.25</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RESUMEN TOTAL -->
+  <div class="section">
+    <div class="section-title">4. RESUMEN DE ESFUERZO</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Módulo</th>
+          <th class="td-center">Tareas</th>
+          <th class="td-center">H/H Base Datos</th>
+          <th class="td-center">H/H Backend</th>
+          <th class="td-center">H/H Frontend</th>
+          <th class="td-center">H/H Testing</th>
+          <th class="td-center">TOTAL H/H</th>
+          <th class="td-center">Días hábiles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Módulo 1 — HbA1c</td>
+          <td class="td-num">13</td>
+          <td class="td-num">22</td>
+          <td class="td-num">14</td>
+          <td class="td-num">48</td>
+          <td class="td-num">19</td>
+          <td class="td-num"><strong>103</strong></td>
+          <td class="td-num">~12.5</td>
+        </tr>
+        <tr>
+          <td>Módulo 2 — Grupos Derivación</td>
+          <td class="td-num">8</td>
+          <td class="td-num">12</td>
+          <td class="td-num">9</td>
+          <td class="td-num">20</td>
+          <td class="td-num">16</td>
+          <td class="td-num"><strong>57</strong></td>
+          <td class="td-num">~7.25</td>
+        </tr>
+        <tr>
+          <td><em>Buffer contingencias (10%)</em></td>
+          <td></td><td></td><td></td><td></td><td></td>
+          <td class="td-num"><em>16</em></td>
+          <td class="td-num"><em>~2</em></td>
+        </tr>
+        <tr class="totals-row">
+          <td>TOTAL GENERAL</td>
+          <td class="td-num">21</td>
+          <td class="td-num">34</td>
+          <td class="td-num">23</td>
+          <td class="td-num">68</td>
+          <td class="td-num">35</td>
+          <td class="td-num">176</td>
+          <td class="td-num">~22 días</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- GANTT -->
+  <div class="section">
+    <div class="section-title">5. DIAGRAMA GANTT — Distribución Semanal</div>
+    <div class="section-subtitle">Estimado para 1 desarrollador trabajando 8 h/día. Inicio: lunes 16/03/2026.</div>
+    <div class="gantt-wrap">
+      <table class="gantt-table">
+        <thead>
+          <tr>
+            <th style="width:36%; text-align:left;">Actividad</th>
+            <th>Sem 1<br/>16–20 Mar</th>
+            <th>Sem 2<br/>23–27 Mar</th>
+            <th>Sem 3<br/>30 Mar–3 Abr</th>
+            <th>Sem 4<br/>7–11 Abr</th>
+            <th>Sem 5<br/>14–17 Abr</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1.1–1.3</strong> BD: producto + SPs HbA1c</td>
+            <td class="gantt-cell"><span class="bar bar-f1">&nbsp;</span></td>
+            <td></td><td></td><td></td><td></td>
+          </tr>
+          <tr>
+            <td><strong>1.4–1.6</strong> Backend: modelo + controlador</td>
+            <td class="gantt-cell"><span class="bar bar-f1">&nbsp;</span></td>
+            <td></td><td></td><td></td><td></td>
+          </tr>
+          <tr>
+            <td><strong>1.7–1.9</strong> Frontend: recepción + resultado</td>
+            <td></td>
+            <td class="gantt-cell"><span class="bar bar-f2">&nbsp;</span></td>
+            <td class="gantt-cell"><span class="bar bar-f2">&nbsp;</span></td>
+            <td></td><td></td>
+          </tr>
+          <tr>
+            <td><strong>1.10–1.11</strong> Frontend: validación + PDFs</td>
+            <td></td><td></td>
+            <td class="gantt-cell"><span class="bar bar-f2">&nbsp;</span></td>
+            <td></td><td></td>
+          </tr>
+          <tr>
+            <td><strong>1.12–1.13</strong> Menú + Pruebas HbA1c</td>
+            <td></td><td></td>
+            <td class="gantt-cell"><span class="bar bar-f4">&nbsp;</span></td>
+            <td class="gantt-cell"><span class="bar bar-f4">&nbsp;</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>2.1–2.2</strong> BD: tablas + SP grupos</td>
+            <td></td><td></td><td></td>
+            <td class="gantt-cell"><span class="bar bar-f3">&nbsp;</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>2.3–2.4</strong> Backend: modelo + controlador grupos</td>
+            <td></td><td></td><td></td>
+            <td class="gantt-cell"><span class="bar bar-f3">&nbsp;</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>2.5–2.6</strong> Frontend: vistas grupos</td>
+            <td></td><td></td><td></td>
+            <td class="gantt-cell"><span class="bar bar-f3">&nbsp;</span></td>
+            <td class="gantt-cell"><span class="bar bar-f3">&nbsp;</span></td>
+          </tr>
+          <tr>
+            <td><strong>2.7–2.8</strong> Integración + pruebas grupos</td>
+            <td></td><td></td><td></td><td></td>
+            <td class="gantt-cell"><span class="bar bar-f4">&nbsp;</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px; display:flex; gap:16px; font-size:8.5pt;">
+      <span><span class="bar bar-f1" style="display:inline-block;width:16px;height:10px;border-radius:2px;vertical-align:middle;">&nbsp;</span> Base de datos</span>
+      <span><span class="bar bar-f2" style="display:inline-block;width:16px;height:10px;border-radius:2px;vertical-align:middle;">&nbsp;</span> Frontend HbA1c</span>
+      <span><span class="bar bar-f3" style="display:inline-block;width:16px;height:10px;border-radius:2px;vertical-align:middle;">&nbsp;</span> Módulo Grupos</span>
+      <span><span class="bar bar-f4" style="display:inline-block;width:16px;height:10px;border-radius:2px;vertical-align:middle;">&nbsp;</span> Pruebas / Configuración</span>
+    </div>
+  </div>
+
+  <!-- PREREQUISITOS -->
+  <div class="section">
+    <div class="section-title">6. PRE-REQUISITOS Y DEPENDENCIAS</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Pre-requisito</th>
+          <th>Responsable</th>
+          <th>Estado</th>
+          <th>Impacto si no está</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Definir <strong>id_producto</strong> para HbA1c en tbl_producto</td>
+          <td>Coordinador Lab</td>
+          <td class="prio-alta">PENDIENTE</td>
+          <td>Bloquea tareas 1.1, 1.4, 1.6</td>
+        </tr>
+        <tr>
+          <td>Confirmar <strong>id_dependencia</strong> del Lab Referencial para HbA1c (¿mismo que PSA = 67?)</td>
+          <td>Coordinador Lab</td>
+          <td class="prio-alta">PENDIENTE</td>
+          <td>Bloquea lógica de derivación en ctrlLab</td>
+        </tr>
+        <tr>
+          <td>Formato del archivo <strong>Excel de resultados HbA1c</strong> (columnas esperadas)</td>
+          <td>Lab Referencial</td>
+          <td class="prio-alta">PENDIENTE</td>
+          <td>Bloquea tarea 1.9 (carga de archivo)</td>
+        </tr>
+        <tr>
+          <td>Firmas digitales / imágenes para PDF HbA1c</td>
+          <td>Lab Referencial</td>
+          <td class="prio-media">PENDIENTE</td>
+          <td>Solo estético, no bloquea flujo</td>
+        </tr>
+        <tr>
+          <td>Definición de reglas de negocio para grupos de derivación (¿un establecimiento puede estar en 2 grupos?)</td>
+          <td>Jefatura DIRIS</td>
+          <td class="prio-alta">PENDIENTE</td>
+          <td>Impacta diseño BD tarea 2.1</td>
+        </tr>
+        <tr>
+          <td>Acceso a servidor de producción para despliegue</td>
+          <td>TI / Infraestructura</td>
+          <td class="prio-media">OK</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RIESGOS -->
+  <div class="section">
+    <div class="section-title">7. GESTIÓN DE RIESGOS</div>
+    <table class="riesgo-table">
+      <thead>
+        <tr>
+          <th>Riesgo</th>
+          <th>Probabilidad</th>
+          <th>Impacto</th>
+          <th>Plan de mitigación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Formato Excel HbA1c diferente al de PSA</td>
+          <td class="alto">Alta</td>
+          <td class="alto">Alto</td>
+          <td>Solicitar muestra del archivo antes de iniciar tarea 1.9. Diseñar parser configurable.</td>
+        </tr>
+        <tr>
+          <td>SP de BD tarda más de lo estimado</td>
+          <td class="medio">Media</td>
+          <td class="medio">Medio</td>
+          <td>Iniciar BD en paralelo con análisis. Reservar buffer del 10%.</td>
+        </tr>
+        <tr>
+          <td>OPcache en producción no refresca automáticamente</td>
+          <td class="alto">Alta</td>
+          <td class="medio">Medio</td>
+          <td>Crear script opcache_reset.php para cada despliegue. Reiniciar Apache post-deploy.</td>
+        </tr>
+        <tr>
+          <td>Columnas ambiguas en nuevos JOINs (error PostgreSQL)</td>
+          <td class="medio">Media</td>
+          <td class="medio">Medio</td>
+          <td>Calificar siempre con alias de tabla en todas las consultas nuevas.</td>
+        </tr>
+        <tr>
+          <td>Requisitos de grupos de derivación cambian durante desarrollo</td>
+          <td class="medio">Media</td>
+          <td class="alto">Alto</td>
+          <td>Validar diseño BD con jefatura antes de codificar (tarea 2.1 es puerta de entrada).</td>
+        </tr>
+        <tr>
+          <td>Retrasos por falta de información (IDs, firmas, formatos)</td>
+          <td class="alto">Alta</td>
+          <td class="medio">Medio</td>
+          <td>Levantar pre-requisitos en paralelo con tareas de BD. No iniciar codificación hasta tener IDs.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SUPUESTOS -->
+  <div class="section supuestos">
+    <div class="section-title">8. SUPUESTOS Y RESTRICCIONES</div>
+    <ul>
+      <li>Se dispone de <strong>1 desarrollador full-stack</strong> dedicado al proyecto con conocimiento del sistema existente.</li>
+      <li>El servidor de desarrollo local usa XAMPP con PHP ≥ 7.4 y PostgreSQL ≥ 12.</li>
+      <li>El entorno de producción tiene la misma versión de PHP y PostgreSQL que el entorno de desarrollo.</li>
+      <li>Las estimaciones de horas no incluyen capacitación al usuario final ni elaboración de manuales.</li>
+      <li>El flujo de HbA1c es <strong>idéntico en lógica</strong> al de PSA — solo cambian: id_producto, estructura del Excel de resultados, y firmas del PDF.</li>
+      <li>No se requiere autenticación adicional ni cambios en el sistema de sesiones actual.</li>
+      <li>El <em>buffer del 10%</em> cubre: correcciones de bugs en pruebas, ajustes de interfaz y coordinación.</li>
+      <li>Los despliegues a producción se realizan vía <strong>git pull</strong> desde el repositorio GitHub configurado.</li>
+    </ul>
+  </div>
+
+  <!-- FIRMA -->
+  <div class="firma-grid">
+    <div class="firma-box">
+      <div class="firma-line"></div>
+      <div class="firma-name">Elaborado por</div>
+      <div class="firma-role">Analista de Sistemas</div>
+    </div>
+    <div class="firma-box">
+      <div class="firma-line"></div>
+      <div class="firma-name">Revisado por</div>
+      <div class="firma-role">Jefe de TI / Coordinador</div>
+    </div>
+    <div class="firma-box">
+      <div class="firma-line"></div>
+      <div class="firma-name">Aprobado por</div>
+      <div class="firma-role">Dirección / Jefatura DIRIS</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <span>PDS-LAB-2026-001 v1.0 — CONFIDENCIAL USO INTERNO</span>
+    <span>Sistema di_gest_lab — DIRIS Lima Centro — Marzo 2026</span>
+  </div>
+
+</div>
+</body>
+</html>
