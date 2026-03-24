@@ -33,11 +33,15 @@ $frm_origen = $_GET['ori'];
 if($frm_origen == "LR"){
 	$nro_atencion = $rsA[0]['nro_atencion_manual'];
 } else {
-	if($rsA[0]['id_tipo_genera_correlativo'] == "1"){
-		$nro_atencion = $rsA[0]['nro_atencion'] . "-". $rsA[0]['anio_atencion'];
-	} else {
-		$nro_atencion = substr($rsA[0]['nro_atencion'], 0, 6).substr($rsA[0]['nro_atencion'],6);
-	}
+	//if(!empty($rsA[0]['nro_atencion'])){
+		if($rsA[0]['id_tipo_genera_correlativo'] == "1"){
+			$nro_atencion = $rsA[0]['nro_atencion'] . "-". $rsA[0]['anio_atencion'];
+		} else {
+			$nro_atencion = substr($rsA[0]['nro_atencion'], 0, 6).substr($rsA[0]['nro_atencion'],6);
+		}
+	//} else {
+	//	$nro_atencion = $rsA[0]['nro_atencion_manual'];
+	//}
 }
 ?>
 <div class="container-fluid">
@@ -45,7 +49,7 @@ if($frm_origen == "LR"){
     <div class="panel-heading">
       <div class="row">
 		<div class="col-sm-6">
-			<h3 class="panel-title"><strong>REGISTRAR O MODIFICAR RESULTADOS <?php echo ($frm_origen <> 'deri') ? '' : " - ATENCION N°" . $nro_atencion?></strong></h3>
+			<h3 class="panel-title"><strong>REGISTRAR O MODIFICAR RESULTADOS - ATENCION N°<?php echo $nro_atencion?></strong></h3>
 		</div>
 		<div class="col-sm-6 text-right">
 			<h3 class="panel-title"><a href="#" onclick="event.preventDefault(); open_ayuda()">Ayuda <i class="fa fa-question-circle-o" aria-hidden="true"></i></a></h3>

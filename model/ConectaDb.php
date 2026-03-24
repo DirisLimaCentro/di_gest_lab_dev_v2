@@ -26,10 +26,14 @@ class ConectaDb {
 
     public function query($sql) {
         $l = array();
+        pg_query($this->cn, 'BEGIN');
         $rs = pg_query($this->cn, $sql);
+        pg_query($this->cn, 'COMMIT');
 
-        while ($obj = pg_fetch_array($rs)) {
-            $l[] = $obj;
+        if ($rs) {
+            while ($obj = pg_fetch_array($rs)) {
+                $l[] = $obj;
+            }
         }
 
         $this->rs = $l;
